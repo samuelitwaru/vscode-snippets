@@ -1,0 +1,141 @@
+{
+
+	"djangoModelChar": {
+		"prefix": "djangoModelChar",
+		"body": "models.CharField(max_length=${1:max_length})"
+	},
+	"djangoModelInt": {
+		"prefix": "djangoModelInt",
+		"body": "models.IntegerField()"
+	},
+	"djangoModelFloat": {
+		"prefix": "djangoModelFloat",
+		"body": "models.FloatField()"
+	},
+	"djangoModelBool": {
+		"prefix": "djangoModelBool",
+		"body": "models.BooleanField(default=${1:default})"
+	},
+	"djangoModelDateTime": {
+		"prefix": "djangoModelDateTime",
+		"body": "models.DateTimeField(auto_now=True)"
+	},
+	"djangoModelDate": {
+		"prefix": "djangoModelDate",
+		"body": "models.DateField(auto_now=True)"
+	},
+	"djangoModelEmail": {
+		"prefix": "djangoModelEmail",
+		"body": "models.EmailField()"
+	},
+	"djangoModelForeignKey": {
+		"prefix": "djangoModelForeignKey",
+		"body": "models.ForeignKey(${1:to_class_model}, on_delete=${1:models.CASCADE})"
+	},
+	"djangoModelM2M": {
+		"prefix": "djangoModelM2M",
+		"body": "models.ManyToManyField('${1:to_class_model}', through='{2:through_class_model}', through_fields=('{3:through_field_1}', '{4:through_field_2}'))"
+	},
+
+
+	"djangoFormChar": {
+		"prefix": "djangoFormChar",
+		"body": "forms.CharField()"
+	},
+	"djangoFormPassword": {
+		"prefix": "djangoFormPassword",
+		"body": "forms.CharField(widget=forms.PasswordInput)"
+	},
+	"djangoFormInt": {
+		"prefix": "djangoFormInt",
+		"body": "forms.IntegerField()"
+	},
+	"djangoFormFloat": {
+		"prefix": "djangoFormFloat",
+		"body": "forms.FloatField()"
+	},
+	"djangoFormBool": {
+		"prefix": "djangoFormBool",
+		"body": "forms.BooleanField(required=False)"
+	},
+	"djangoFormDate": {
+		"prefix": "djangoFormDate",
+		"body": "forms.DateField()"
+	},
+	"djangoFormEmail": {
+		"prefix": "djangoFormEmail",
+		"body": "forms.EmailField()"
+	},
+
+
+	"djangoCreateView": {
+		"prefix": "djangoCreateView",
+		"body": [
+			"def create_${1:entity}(request):",
+			"\tcreate_${1:entity}_form = Create${1/(.*)/${1:/pascalcase}/}Form()",
+			"\tif request.method == 'POST':",
+			"\t\tif create_${1:entity}_form.is_valid():",
+			"\t\t\tdata = create_${1:entity}_form.cleaned_data",
+			"\t\t\tcategory = ${1/(.*)/${1:/pascalcase}/}.objects.create(**data)",
+			"\t\t\tmessages.success(request, '${1/[\\_]/ /g} created')",
+			"\t\t\treturn redirect('bar:get_${1:entity}s')",
+			"\tcontext = {",
+			"\t\t'create_${1:entity}_form': create_${1:entity}_form,",
+			"\t}",
+			"\treturn render(request, '${1:entity}}/create-${1/[\\_]/-/g}.html', context)"
+		]
+	},
+	"djangoReadView": {
+		"prefix": "djangoReadView",
+		"body": [
+			"def get_${1:entity}s(request):",
+			"\tquery = ${1/(.*)/${1:/pascalcase}/}.objects",
+			"\tfilter_${1:entity}s_form = Filter${1/(.*)/${1:/pascalcase}/}sForm(data=request.GET)",
+			"\tif filter_${1:entity}s_form.is_valid():",
+			"\t\tdata = filter_${1:entity}s_form.cleaned_data",
+			"\t\t# get data",
+			"\t\t",
+			"\t\t# perform query",
+			"\t",
+			"\tpage = int(request.GET.get('page', 1))",
+			"\tpaginator = Paginator(query.all(), settings.PAGINATION_COUNT)",
+			"\t${1:entity}s = paginator.get_page(page)",
+			"\tcontext = {",
+			"\t\t'${1:entity}s': ${1:entity}s,",
+			"\t\t'filter_${1:entity}s_form': filter_${1:entity}s_form,",
+			"\t}",
+			"\treturn render(request, '${1:entity}/${1/[\\_]/-/g}s.html', context)",
+		]
+	},
+	"djangoUpdateView": {
+		"prefix": "djangoUpdateView",
+		"body": [
+			"def update_${1:entity}(request, id):",
+			"\t${1:entity} = ${1/(.*)/${1:/pascalcase}/}.objects.get(id=id)",
+			"\tupdate_${1:entity}_form = Update${1/(.*)/${1:/pascalcase}/}Form(data={})",
+			"\tif request.method == 'POST':",
+			"\t\tupdate_${1:entity}_form = Update${1/(.*)/${1:/pascalcase}/}Form(data=request.POST, ${1:entity}=${1:entity})",
+			"\t\tif update_${1:entity}_form.is_valid():",
+			"\t\t\tdata = update_${1:entity}_form.cleaned_data",
+			"\t\t\t${1:entity}.name = data['name']",
+			"\t\t\t${1:entity}.save()",
+			"\t\t\tmessages.success(request, '${1/[\\_]/ /g} updated.')",
+			"\t\t\treturn redirect('bar:get_${1:entity}s')",
+			"\tcontext = {",
+			"\t\t'update_${1:entity}_form': update_${1:entity}_form,",
+			"\t\t'${1:entity}': ${1:entity},",
+			"\t}",
+			"\treturn render(request, '${1:entity}/${1/[\\_]/-/g}.html', context)"
+		]
+	},
+	"djangoDeleteView": {
+		"prefix": "djangoDeleteView",
+		"body": [
+			"def delete_${1:entity}(request, id):",
+			"\t${1:entity} = ${1/(.*)/${1:/pascalcase}/}.objects.get(id=id)",
+			"\t${1:entity}.delete()",
+			"\tmessages.success(request, '${1/[\\_]/ /g} deleted')",
+			"\treturn redirect('bar:get_${1:entity}s')",
+		]
+	},
+}

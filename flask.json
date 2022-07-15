@@ -1,0 +1,229 @@
+{
+    "flaskView": {
+		"prefix": "flaskView",
+		"body": [
+			"from flask import Blueprint, render_template, url_for, request, redirect, flash, abort",
+			"from app.models import ${1/(.*)/${1:/pascalcase}/}",
+			"from flask_login import login_required, current_user",
+			"from app import app, db\n\n",
+			"${1:entity}_bp = Blueprint('${1:entity}', __name__, url_prefix='/${1/[\\_]/-/g}')"
+		],
+		"description": "flaskView"
+	},
+
+	"flaskForm": {
+		"prefix": "flaskForm",
+		"body": [
+			"from flask_wtf import FlaskForm",
+			"from wtforms import validators",
+			"import wtforms",
+			"from wtforms import widgets",
+			"from flask_wtf.file import FileField, FileAllowed, FileRequired"
+		],
+		"description": "flaskForm"
+	},
+
+	"flaskFormClass": {
+		"prefix": "flaskFormClass",
+		"body": [
+			"class ${1:Name}Form(FlaskForm):",
+			"\tpass",
+			"\tdef __init__(self, *args, **kwargs):",
+			"\t\tsuper().__init__(*args, **kwargs)"
+		],
+		"description": "flaskFormClass"
+	},
+
+	"flaskModel": {
+		"prefix": "flaskModel",
+		"body": [
+			"from datetime import datetime",
+			"from flask_sqlalchemy import Model",
+			"from sqlalchemy import Column, DateTime, desc",
+			"from flask_login import UserMixin, current_user",
+			"from app import app, db",
+			"from werkzeug.security import generate_password_hash, check_password_hash",
+			"",
+			"",
+			"class TimestampedModel(Model):\n\tcreated_at = Column(DateTime, default=datetime.utcnow)\n\tupdated_at = Column(DateTime)"
+		],
+		"description": "flaskModel"
+	},
+
+	"flaskCreateView": {
+		"prefix": "flaskCreateView",
+		"body": [
+			"@${1:entity}.route('/${1/[\\_]/-/g}/create', methods=['POST', 'GET'])",
+			"def create_${1:entity}():",
+			"\tcreate_${1:entity}_form = Create${1/(.*)/${1:/pascalcase}/}Form()",
+			"\tif create_${1:entity}_form.validate_on_submit():",
+			"\t\tdata = create_${1:entity}_form.data",
+			"\t\t# get values",
+			"\t\t",
+			"\t\t# save ${1:entity}",
+			"\t\t",
+			"\t\tflash('${1/[\\_]/ /g} created.', 'success')",
+			"\t\treturn redirect(request.referrer)",
+			"\treturn render_template('${1:entity}/create-${1/[\\_]/-/g}.html', create_${1:entity}_form=create_${1:entity}_form)",
+		],
+		"description": "flaskCreateView"
+	},
+
+
+	"flaskReadView": {
+		"prefix": "flaskReadView",
+		"body": [
+			"@${1:entity}.route('/')",
+			"def get_${1:entity}s():",
+			"\tfilter_${1:entity}_form = Filter${1/(.*)/${1:/pascalcase}/}Form(request.args, meta={'csrf': False})",
+			"\tif request.args and filter_${1:entity}_form.validate():",
+			"\t\tdata = filter_${1:entity}_form.data",
+			"\t\t# get values",
+			"\t\t",
+			"\t\t# perform filter",
+			"\t\t",
+			"\telse:",
+			"\t\tquery = ${1/(.*)/${1:/pascalcase}/}.query",
+			"\tpage = request.args.get('page', 1)",
+			"\tpagination = query.paginate(page, 20)",
+			"\tfilter_${1:entity}_form = Filter${1/(.*)/${1:/pascalcase}/}Form(request.args)",
+			"\treturn render_template('${1:entity}/${1/[\\_]/-/g}s.html', filter_${1:entity}_form=filter_${1:entity}_form, pagination=pagination)",
+		],
+		"description": "flaskReadView"
+	},
+
+
+	"flaskDeleteView": {
+		"prefix": "flaskDeleteView",
+		"body": [
+			"@${1:entity}.route('/<int:id>/delete')",
+			"def delete_${1:entity}(id):",
+			"\t${1:entity} = ${1/(.*)/${1:/pascalcase}/}.query.get(id)",
+			"\tdb.session.delete(${1:entity})",
+			"\tdb.session.commit()",
+			"\tflash('${1/[\\_]/ /g} deleted.', 'success')",
+			"\treturn redirect(url_for('${1:entity}.get_${1:entity}s'))",
+		],
+		"description": "flaskDeleteView"
+	},
+
+	"flaskUpdateView": {
+		"prefix": "flaskUpdateView",
+		"body": [
+			"@${1:entity}.route('/<int:id>/update', methods=['POST', 'GET'])",
+			"def update_${1:entity}(id):",
+			"\t${1:entity} = ${1/(.*)/${1:/pascalcase}/}.query.get(id)",
+			"\tupdate_${1:entity}_form = Update${1/(.*)/${1:/pascalcase}/}Form(obj=${1:entity})",
+			"\tif update_${1:entity}_form.validate_on_submit():",
+			"\t\tdata = update_${1:entity}_form.data",
+			"\t\t# get values",
+			"\t\t",
+			"\t\t# update ${1:entity}",
+			"\t\t",
+			"\t\tflash('${1/[\\_]/ /g} updated.', 'success')",
+			"\t\treturn redirect(request.referrer)",
+			"\treturn render_template('${1/[\\_]/-/g}/update-${1/[\\_]/-/g}.html', update_${1:entity}_form=update_${1:entity}_form, ${1:entity}=${1:entity})",
+		],
+		"description": "flaskUpdateView"
+	},
+
+	"flaskTextField": {
+		"prefix": "flaskTextField",
+		"body": "${1:field_name} = wtforms.StringField(validators=[validators.DataRequired()])",
+		"description": "flaskTextField"
+	},
+	"flaskNumberField": {
+		"prefix": "flaskTextField",
+		"body": "${1:field_name} = wtforms.IntegerField(validators=[validators.DataRequired()])",
+		"description": "flaskTextField"
+	},
+	"flaskDateField": {
+		"prefix": "flaskDateField",
+		"body": "${1:field_name} = wtforms.DateField(validators=[validators.DataRequired()])",
+		"description": "flaskDateField"
+	},
+	"flaskSelectField": {
+		"prefix": "flaskSelectField",
+		"body": "${1:field_name} = wtforms.SelectField(validators=[validators.DataRequired()], choices=[])",
+		"description": "flaskSelectField"
+	},
+	"flaskTextareaField": {
+		"prefix": "flaskTextareaField",
+		"body": "${1:field_name} = wtforms.TextAreaField(validators=[validators.DataRequired()])",
+		"description": "flaskTextareaField"
+	},
+	"flaskRadioField": {
+		"prefix": "flaskRadioField",
+		"body": "${1:field_name} = wtforms.RadioField(validators=[validators.DataRequired()], coerce=int)",
+		"description": "flaskRadioField"
+	},
+	"flaskCheckboxField": {
+		"prefix": "flaskCheckboxField",
+		"body": "${1:field_name} = wtforms.BooleanField(validators=[validators.InputRequired()])",
+		"description": "flaskCheckboxField"
+	},
+	"flaskEmailField": {
+		"prefix": "flaskEmailField",
+		"body": "${1:field_name} = wtforms.StringField(validators=[validators.DataRequired(), validators.Email()])",
+		"description": "flaskEmailField"
+	},
+	"flaskPasswordField": {
+		"prefix": "flaskPasswordField",
+		"body": "password = wtforms.PasswordField('Password', validators=[DataRequired()])",
+		"description": "flaskPasswordField"
+	},
+	"flaskPasswordConfirmField": {
+		"prefix": "flaskPasswordConfirmField",
+		"body": [
+			"password = wtforms.PasswordField('Password', validators=[DataRequired()])",
+			"confirm_password = wtforms.PasswordField('Confirm password', validators=[DataRequired(), EqualTo('password')])"
+		],
+		"description": "flaskPasswordConfirmField"
+	},
+	"flaskFileField": {
+		"prefix": "flaskFileField",
+		"body": "${1:field_name} = FileField('${1:field_name}', validators=[])",
+		"description": "flaskFileField"
+	},
+
+	"flaskStringColumn": {
+		"prefix": "flaskStringColumn",
+		"body": "${1:field_name} = db.Column(db.String(${2:len}), nullable=False)",
+		"description": "flaskStringColumn"
+	},
+	"flaskIntegerColumn": {
+		"prefix": "flaskIntegerColumn",
+		"body": "${1:field_name} = db.Column(db.Integer, nullable=False)",
+		"description": "flaskIntegerColumn"
+	},
+	"flaskDatetimeColumn": {
+		"prefix": "flaskDatetimeColumn",
+		"body": "${1:field_name} = db.Column(db.DateTime, nullable=False)",
+		"description": "flaskDatetimeColumn"
+	},
+	"flaskForeignKeyColumn": {
+		"prefix": "flaskForeignKeyColumn",
+		"body": "${1:field_name}_id = db.Column(db.Integer, db.ForeignKey('${1:field_name}.id', ondelete='CASCADE'), nullable=False)",
+		"description": "flaskForeignKeyColumn"
+	},
+	"flaskRelationshipField": {
+		"prefix": "flaskFloatColumn",
+		"body": "${1:field_name} = db.relationship('${1/(.*)/${1:/pascalcase}/}', backref='${2:backref}')",
+		"description": "flaskFloatColumn"
+	},
+	"flaskFloatColumn": {
+		"prefix": "flaskFloatColumn",
+		"body": "${1:field_name} = db.Column(db.Float, nullable=False)",
+		"description": "flaskFloatColumn"
+	},
+	"flaskBooleanColumn": {
+		"prefix": "flaskBooleanColumn",
+		"body": "${1:field_name} = db.Column(db.Float, nullable=False)",
+		"description": "flaskBooleanColumn"
+	},
+	"flaskBooleanField": {
+		"prefix": "flaskBooleanField",
+		"body": "${1:field_name} = db.Column(db.Float, nullable=False)",
+		"description": "flaskBooleanField"
+	},
+}
